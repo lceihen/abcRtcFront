@@ -13,30 +13,30 @@ makeLogFile:
     - . ./depoly/version.sh
   interruptible: true
 
-artifacts:
-  stage: artifacts
-  image: node:16.17.0
-  script:
-    - npm config set registry http://registry.npm.taobao.org/
-    - npm install -g pnpm
-    - pnpm config set registry https://registry.npm.taobao.org/
-    - pnpm install
-    - pnpm run build
-  artifacts:
-    paths:
-      - dist/
-    exclude:
-      - node_modules/
-  cache:
-    when: on_success
-    key:
-      files:
-        - pnpm-lock.yaml
-        - package.json
-  only:
-    - main
-    - master
-  interruptible: true
+# artifacts:
+#   stage: artifacts
+#   image: node:16.17.0
+#   script:
+#     - npm config set registry http://registry.npm.taobao.org/
+#     - npm install -g pnpm
+#     - pnpm config set registry https://registry.npm.taobao.org/
+#     - pnpm install
+#     - pnpm run build
+#   artifacts:
+#     paths:
+#       - dist/
+#     exclude:
+#       - node_modules/
+#   cache:
+#     when: on_success
+#     key:
+#       files:
+#         - pnpm-lock.yaml
+#         - package.json
+#   only:
+#     - main
+#     - master
+#   interruptible: true
 
 deploy:
   image: docker/compose:latest
