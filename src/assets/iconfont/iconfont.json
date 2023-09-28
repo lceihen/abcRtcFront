@@ -1,0 +1,23 @@
+{
+  "id": "4202897",
+  "name": "abcRtcFront",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "语音",
+  "glyphs": [
+    {
+      "icon_id": "21111792",
+      "name": "商务会议",
+      "font_class": "shangwuhuiyi",
+      "unicode": "e621",
+      "unicode_decimal": 58913
+    },
+    {
+      "icon_id": "27655778",
+      "name": "DEM",
+      "font_class": "DEM",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    }
+  ]
+}
