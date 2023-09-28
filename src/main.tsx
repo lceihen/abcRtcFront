@@ -9,6 +9,7 @@ import "@/assets/css/index.css";
 import { Header, Footer } from "antd/es/layout/layout";
 import styles from "./index.module.less";
 import adapter from "webrtc-adapter";
+// 2
 initSocket()
   .then(() =>
     ReactDOM.createRoot(document.getElementById("root")!).render(
