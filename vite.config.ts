@@ -5,7 +5,7 @@ import * as path from "path";
 export default defineConfig(({ mode }) => {
   return {
     server: {
-      host: "localhost",
+      host: "0.0.0.0",
       port: "5173",
     },
     plugins: [react()],

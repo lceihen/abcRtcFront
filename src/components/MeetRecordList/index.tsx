@@ -1,7 +1,6 @@
 import { UnorderedListOutlined } from "@ant-design/icons";
 import { DrawerForm } from "@ant-design/pro-components";
 import { Button, Avatar, List, Typography } from "antd";
-import socket from "@/config/socketInstance";
 import dayjs from "dayjs";
 const { Text } = Typography;
 
@@ -36,6 +35,10 @@ const MeetRecordList = (props) => {
       <List
         itemLayout="horizontal"
         dataSource={data}
+        pagination={{
+          position: "bottom",
+          align: "end",
+        }}
         renderItem={(item, index) => (
           <List.Item
             actions={[

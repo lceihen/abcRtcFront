@@ -1,18 +1,19 @@
-import request from "@/utils/request";
+import { httpsRequest } from "@/api/index";
+
 export const getToken = (params: any) => {
-  return request({
+  return httpsRequest({
     params,
     url: "/api/auth/token",
   });
 };
 export const getUserInfo = () => {
-  return request({
+  return httpsRequest({
     url: "/api/user",
   });
 };
 
 export const loginOutApi = () => {
-  return request({
+  return httpsRequest({
     url: "/api/auth/loginOut",
   });
 };

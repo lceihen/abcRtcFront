@@ -7,5 +7,7 @@ export const baseUrl = isProd
   : "ws://localhost:3001/rtc";
 
 export const httpsRequestUrl = isProd
-  ? "https://authserve.abclive.cloud"
+  ? "https://authserver.abclive.cloud"
   : "http://localhost:3000";
+
+export const whiteRouterList = ["/auth/callback"];
