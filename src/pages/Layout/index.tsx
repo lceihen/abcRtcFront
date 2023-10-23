@@ -50,7 +50,9 @@ const Layout = () => {
 
   const handleLoginOut = async () => {
     await loginOutApi();
-    window.location.href = "/";
+    setTimeout(() => {
+      window.location.href = "/";
+    });
   };
 
   const handleGetMeetRecordList = () => {
