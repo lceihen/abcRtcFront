@@ -135,6 +135,13 @@ const Room = () => {
         }
       };
 
+      currentPeerInstance.oniceconnectionstatechange = function (event) {
+        if (currentPeerInstance.iceConnectionState === "disconnected") {
+          console.log("处理 ICE 连接断开的情况");
+          videoRef.current.srcObject = null;
+        }
+      };
+
       currentPeerInstance.ontrack = (track) => {
         // console.log("接收track", track, Date.now());
         // if (state.anchorRoomUserId === userInfo.id) return;
@@ -188,6 +195,7 @@ const Room = () => {
 
         const videoTrack = tracks[0];
         const videoSettings = videoTrack.getSettings();
+        console.log("videoSettings", videoSettings);
         socket.emit(
           "webrtc_join_socket_group",
           {
@@ -210,32 +218,37 @@ const Room = () => {
           }
         );
         mediaVideoSetting = videoSettings;
-        const canvasWidth = canvasSetting.height * videoSettings.aspectRatio;
+        // const canvasWidth = canvasSetting.height * videoSettings.aspectRatio;
+
+        console.log("视频宽度：" + mediaVideoSetting.width + " 像素");
+        console.log("视频高度：" + mediaVideoSetting.height + " 像素");
 
         setCanvasSetting({
-          width: canvasWidth,
+          width: mediaVideoSetting.width,
+          height: mediaVideoSetting.height,
         });
         videoRef.current.srcObject = stream;
         setIsGetMediaAuth(true);
-        // handleDrawCanvas();
+        handleDrawCanvas();
       });
   };
 
   const handleDrawCanvas = () => {
     const canvasContext = canvasRef.current.getContext("2d");
-    canvasContext.globalCompositeOperation = "copy";
+    // canvasContext.imageSmoothingEnabled = false;
+    // canvasContext.globalCompositeOperation = "copy";
     canvasContext.drawImage(
       videoRef.current,
       0,
       0,
       mediaVideoSetting.width,
-      mediaVideoSetting.height,
-      0,
-      0,
-      canvasRef.current.width,
-      canvasRef.current.height
+      mediaVideoSetting.height
     );
     requestAnimationFrame(handleDrawCanvas);
+  };
+
+  const handleStopScreenShare = () => {
+    videoRef.current.srcObject = null;
   };
 
   return (
@@ -249,6 +262,7 @@ const Room = () => {
               {state.id}
             </Text>
           </Button>
+          <Button onClick={handleStopScreenShare}>断开屏幕共享</Button>
           <Button onClick={handleInitMedia}>切换共享屏幕</Button>
           <Switch
             checked={isUserMedia}
@@ -271,7 +285,7 @@ const Room = () => {
 
       <article className={styles.payer_container}>
         <>
-          {!isGetMediaAuth ? (
+          {/* {!isGetMediaAuth ? (
             <Result
               status="warning"
               title="You need to agreen the asked permission."
@@ -282,17 +296,16 @@ const Room = () => {
                 </Button>
               }
             />
-          ) : null}
+          ) : null} */}
           <canvas
             ref={canvasRef}
             id="canvas"
-            width={mediaVideoSetting.width}
-            height={mediaVideoSetting.height}
+            width={canvasSetting.width}
+            height={canvasSetting.height}
             className={[
               styles.canvas,
               isUserMedia ? styles.self_mirror : "",
               styles.border_container_shadow,
-              isGetMediaAuth ? "" : styles.hidden,
             ].join(" ")}
           ></canvas>
           <video
