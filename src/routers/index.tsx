@@ -12,26 +12,29 @@ export const RouterConfig = [
         path: "/",
         element: <Layout />,
       },
+    ],
+  },
+  {
+    name: "认证管理",
+    path: "/auth",
+    children: [
       {
-        name: "认证管理",
         path: "/auth",
         redirect: "/auth/callback",
-        children: [
-          {
-            name: "回调",
-            path: "/auth/callback",
-            hideInMenu: true,
-            element: <Callback />,
-          },
-        ],
       },
       {
-        name: "房间",
-        path: "/room",
+        name: "回调",
+        path: "/auth/callback",
         hideInMenu: true,
-        element: <Room />,
+        element: <Callback />,
       },
     ],
+  },
+  {
+    name: "房间",
+    path: "/room",
+    hideInMenu: true,
+    element: <Room />,
   },
 ];
 const RouterConfigElement = () => useRoutes(RouterConfig);
