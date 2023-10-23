@@ -38,11 +38,12 @@ const Layout = () => {
     };
 
     socket.emit("createOrJoinRoom", initialValue, (payload) => {
+      console.log("payload-----", payload);
       if (payload.code === "0") {
         handleEntryRoom(payload.data);
         message.success("加入成功");
       } else {
-        message.error("操作失败");
+        message.error(payload.message || "操作失败");
       }
     });
   };
