@@ -18,7 +18,7 @@ const Callback = () => {
       clientId,
       secret,
     }).finally(() => {
-      navigate("/");
+      window.location.href = "/";
     });
   }, []);
   return null;
