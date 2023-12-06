@@ -19,7 +19,7 @@ export const initSocket = () => {
       //   message.warning("正在连接中");
       // });
       if (isError) window.location.reload();
-      console.log("成功连接");
+      console.log("成功连接服务器");
       resolve();
     });
     socket.io.on("error", (error) => {

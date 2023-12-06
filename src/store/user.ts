@@ -1,7 +1,12 @@
+import { UserInfo } from "@/interface";
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-  userInfo: null,
+interface InitialState {
+  userInfo: UserInfo;
+}
+
+const initialState: InitialState = {
+  userInfo: JSON.parse(localStorage.getItem("userInfo") || "{}"),
 };
 
 export const UserInfoSlice = createSlice({
@@ -10,6 +15,7 @@ export const UserInfoSlice = createSlice({
   reducers: {
     handleSetUserInfo: (state, { payload }) => {
       state.userInfo = payload;
+      localStorage.setItem("userInfo", JSON.stringify(payload));
     },
   },
 });

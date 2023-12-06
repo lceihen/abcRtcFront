@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 const { Text } = Typography;
 
 const MeetRecordList = (props) => {
-  const { data, onOpenChange, handleEntryRoom } = props || {};
+  const { data, handleEntryRoom } = props || {};
   console.log("data", data);
   return (
     <DrawerForm<{
@@ -20,7 +20,7 @@ const MeetRecordList = (props) => {
 
         minWidth: 500,
       }}
-      onOpenChange={onOpenChange}
+      // onOpenChange={onOpenChange}
       trigger={
         <Button type="primary">
           <UnorderedListOutlined />
@@ -44,7 +44,11 @@ const MeetRecordList = (props) => {
             actions={[
               <a
                 key="list-loadmore-edit"
-                onClick={() => handleEntryRoom && handleEntryRoom(item)}
+                onClick={() => {
+                  const newItem = { ...item };
+                  delete newItem.User;
+                  handleEntryRoom && handleEntryRoom(newItem);
+                }}
               >
                 connect
               </a>,

@@ -28,24 +28,25 @@ const Layout = () => {
   // }, []);
 
   const handleJoinRoom = (params = {}) => {
-    const initialValue = {
-      audio: false,
-      video: false,
-      roomId: params.roomId ? params.roomId : null,
-      roomName: params.roomName,
-      operateType: params.operateType,
-      roomType: params.roomType,
-    };
+    // const initialValue = {
+    //   audio: false,
+    //   video: false,
+    //   roomId: params.roomId ? params.roomId : null,
+    //   roomName: params.roomName,
+    //   operateType: params.operateType,
+    //   roomType: params.roomType,
+    // };
 
-    socket.emit("createOrJoinRoom", initialValue, (payload) => {
-      console.log("payload-----", payload);
-      if (payload.code === "0") {
-        handleEntryRoom(payload.data);
-        message.success("加入成功");
-      } else {
-        message.error(payload.message || "操作失败");
-      }
-    });
+    // socket.emit("createOrJoinRoom", initialValue, (payload) => {
+    //   console.log("payload-----", payload);
+    //   if (payload.code === "0") {
+    //     handleEntryRoom(payload.data);
+    //     message.success("加入成功");
+    //   } else {
+    //     message.error(payload.message || "操作失败");
+    //   }
+    // });
+    handleEntryRoom(params);
   };
 
   const handleLoginOut = async () => {
@@ -74,8 +75,16 @@ const Layout = () => {
   };
 
   const handleEntryRoom = (roomInfo) => {
-    navigate("/room", { state: roomInfo });
+    console.log("roomInfo", roomInfo);
+    delete roomInfo.submit;
+    navigate("/room", {
+      state: { roomInfo: roomInfo },
+    });
   };
+
+  useEffect(() => {
+    handleGetMeetRecordList();
+  }, []);
 
   return (
     <>
@@ -88,7 +97,7 @@ const Layout = () => {
               btnLabel="加入会议"
             />
             <MeetRecordList
-              onOpenChange={handleGetMeetRecordList}
+              // onOpenChange={handleGetMeetRecordList}
               data={meetRecordList}
               handleEntryRoom={handleEntryRoom}
             />

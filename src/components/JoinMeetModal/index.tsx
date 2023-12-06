@@ -75,12 +75,18 @@ const JoinMeetModal = (props) => {
           name="video"
           width="md"
           label="是否开启视频"
+          fieldProps={{
+            defaultChecked: true,
+          }}
         ></ProFormSwitch>
 
         <ProFormSwitch
           name="audio"
           width="md"
           label="是否开启音频"
+          fieldProps={{
+            defaultChecked: true,
+          }}
         ></ProFormSwitch>
       </ProForm.Group>
     </ModalForm>

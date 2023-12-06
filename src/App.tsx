@@ -1,23 +1,25 @@
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import RouterConfigElement from "@/routers";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getUserInfo } from "@/api";
 import { handleSetUserInfo } from "@/store/user";
 import { whiteRouterList } from "./config";
+import { ResponseData, UserInfo } from "./interface";
 
 function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!whiteRouterList.includes(location.pathname)) {
-      getUserInfo().then((res) => {
+      getUserInfo().then((res: ResponseData<UserInfo>) => {
         if (res.code === "0") {
           dispatch(handleSetUserInfo(res.data));
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
