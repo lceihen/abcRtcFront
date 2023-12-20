@@ -17,7 +17,7 @@ deploy:
       else
       mv ./deploy/nginx/nginx.beta.conf ./deploy/nginx/nginx.conf;
       export GIT_BRANCH=-$CI_COMMIT_REF_NAME ;  fi;
-    - sed -i  "s/lcApp/${APP}-${GIT_BRANCH}-${CI_COMMIT_SHORT_SHA}/g" ./deploy/docker-compose.yaml;
+    - sed -i  "s/lcApp/${APP}-${GIT_BRANCH}/g" ./deploy/docker-compose.yaml;
   script:
     - docker-compose -f ./deploy/docker-compose.yaml -p abcRtcFront  up -d --build
     - echo https://${APP}${GIT_BRANCH}.abclive.cloud
