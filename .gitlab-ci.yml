@@ -1,42 +1,11 @@
 image: node:16.3.0
 
+variables:
+  APP: "rtc"
+
 stages:
-  - makeLogFile
   - deploy
   - notification
-  - artifacts
-
-makeLogFile:
-  stage: makeLogFile
-  script:
-    - chmod 777 ./depoly/version.sh
-    - . ./depoly/version.sh
-  interruptible: true
-
-# artifacts:
-#   stage: artifacts
-#   image: node:16.17.0
-#   script:
-#     - npm config set registry http://registry.npm.taobao.org/
-#     - npm install -g pnpm
-#     - pnpm config set registry https://registry.npm.taobao.org/
-#     - pnpm install
-#     - pnpm run build
-#   artifacts:
-#     paths:
-#       - dist/
-#     exclude:
-#       - node_modules/
-#   cache:
-#     when: on_success
-#     key:
-#       files:
-#         - pnpm-lock.yaml
-#         - package.json
-#   only:
-#     - main
-#     - master
-#   interruptible: true
 
 deploy:
   image: docker/compose:latest
@@ -44,21 +13,17 @@ deploy:
   tags:
     - front-docker-1
   before_script:
-    - if [[ "$CI_COMMIT_REF_NAME" == "master" ]] || [[ "$CI_COMMIT_REF_NAME" == "main" ]]; then  echo "SELF_DOMAIN_NAME=''" >> .env; else echo "SELF_DOMAIN_NAME=-$CI_COMMIT_REF_NAME" >> .env;  fi;
-    - ls -las
-    - pwd
-    - sed 's/servername/'"$CI_COMMIT_REF_NAME"'/g' docker-compose.yaml >docker-compose-updated.yaml
-    - cat docker-compose-updated.yaml
+    - if [[ "$CI_COMMIT_REF_NAME" == "master" ]] || [[ "$CI_COMMIT_REF_NAME" == "main" ]]; then  export GIT_BRANCH='';
+      else
+      mv ./deploy/nginx/nginx.beta.conf ./deploy/nginx/nginx.conf;
+      export GIT_BRANCH=-$CI_COMMIT_REF_NAME ;  fi;
   script:
-    - docker-compose -f docker-compose-updated.yaml up -d --build
-  environment:
-    name: canvas
-    url: https://rtc.abclive.cloud
-  interruptible: true
+    - docker-compose -f ./deploy/docker-compose.yaml  up -d --build
+    - echo https://${APP}${GIT_BRANCH}.abclive.cloud
 
 notification:
   stage: notification
   tags:
     - shell-1
   script:
-    - . ./depoly/notification.sh
+    - . ./deploy/notification.sh

@@ -59,12 +59,11 @@ const MeetRecordList = (props) => {
               title={<a href="https://ant.design">{item.roomName} </a>}
               description={
                 <>
+                  房间号:
                   <Text copyable ellipsis>
-                    {" "}
-                    房间号: {item.id}
+                    {item.id}
                   </Text>
                   <Text copyable ellipsis>
-                    {" "}
                     创建时间
                     {dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")}
                   </Text>

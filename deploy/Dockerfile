@@ -25,5 +25,5 @@ RUN ./ossutil64 config -e oss-cn-guangzhou.aliyuncs.com -i LTAI5tC8kTqenE6EUQoQT
 RUN ./ossutil64 -c ~/.ossutilconfig cp -r -f dist oss://lcsubappassets/rtc
 
 FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./deploy/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder code/dist /usr/share/nginx/html

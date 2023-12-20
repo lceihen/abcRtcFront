@@ -27,6 +27,18 @@ import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { UserInfo } from "@/interface";
 import { getType } from "@/utils";
+import {
+  handleBindCandidateDisconnectEvent,
+  handleBindCandidateForPeerConnection,
+  handleBindStreamForPeerConnection,
+  handleBindTrackForPeerConnection,
+  handleClosePeerConnection,
+  handleGenerateAnswer,
+  handleGenerateOffer,
+  handleGeneratePeerConnection,
+  handleGetPeerConnection,
+  handleSavePeerConnection,
+} from "@/utils/rtcUtils";
 
 const { Text } = Typography;
 
@@ -51,8 +63,6 @@ const Room = () => {
   const location: any = useLocation();
 
   const { state, videoAble = true, audioAble = true } = location || {};
-
-  console.log("state--------", state);
 
   const { roomInfo } = state || {};
 
@@ -82,125 +92,18 @@ const Room = () => {
   const videoRef = useRef<any>();
 
   const handleClearCacheValueBeforeConnect = (params) => {
-    const { streams } = params || {};
+    handleStopScreenShare();
     audioStream = null;
     videoStream = null;
 
-    PEERCONNECTION_MAP = [];
+    // PEERCONNECTION_MAP = [];
     videoTrack = null;
     audioTrack = null;
-    // streams?.forEach((stream) => releaseMeidaSource(stream));
-  };
-
-  const releaseMeidaSource = (mediaStream: MediaStream) => {
-    mediaStream?.getTracks().forEach((track) => track.stop());
-  };
-
-  /**
-   *
-   * @returns 创建 RTCPeerConnection 实例
-   */
-  const handleGeneratePeerConnection = () => {
-    return new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: "stun:stun.l.google.com:19302",
-        },
-      ],
-    });
-  };
-
-  /**
-   *
-   * @param peerConnectionInstance peerConnection实例
-   * @returns offer
-   */
-  const handleGenerateOffer = async (peerConnectionInstance) => {
-    const offer = await peerConnectionInstance.createOffer();
-    await peerConnectionInstance.setLocalDescription(offer);
-    return offer;
-  };
-
-  /**
-   *
-   * @param creatorUserId 创建者的userId
-   * @param reciverUserId 接收者的userid
-   * @param peerConnectionInstance peerConnection实例
-   */
-  const handleSavePeerConnection = (
-    creatorUserId,
-    reciverUserId,
-    peerConnectionInstance
-  ) => {
-    const key = creatorUserId + reciverUserId;
-    PEERCONNECTION_MAP[key] = peerConnectionInstance;
-  };
-
-  /**
-   *
-   * @param key1 用户id
-   * @param key2 用户id
-   * @param peerMap peerconnection的map数据
-   * @returns
-   */
-  const handleGetPeerConnection = (
-    key1: string,
-    key2: string,
-    peerMap: Record<string, RTCPeerConnection>
-  ) => {
-    const key = key1 + key2;
-    const newKey = key2 + key1;
-    return peerMap[key] || peerMap[newKey];
-  };
-
-  /**
-   * 为peerconnection增加ontrack事件
-   * @param peerConnectionInstance
-   */
-  const handleBindTrackForPeerConnection = (
-    peerConnectionInstance,
-    videoRef
-  ) => {
-    peerConnectionInstance.ontrack = (track: RTCTrackEvent) => {
-      console.log("ontrack------", track);
-      videoRef.current.srcObject = track.streams[0];
-    };
-  };
-
-  const handleBindCandidateForPeerConnection = (
-    peerConnectionInstance,
-    targetUserId,
-    sourceUserId
-  ) => {
-    peerConnectionInstance.onicecandidate = (event) => {
-      if (event.candidate) {
-        const param = {
-          candidate: event.candidate,
-          targetUserId,
-          sourceUserId,
-        };
-        console.log("start   relayCandidate-------", peerConnectionInstance);
-        socket.emit("relayCandidate", param);
-      }
-    };
-  };
-
-  const handleGenerateAnswer = async (peerConnectionInstance) => {
-    const answer = await peerConnectionInstance.createAnswer();
-    peerConnectionInstance.setLocalDescription(answer);
-    return answer;
-  };
-
-  const handleBindStreamForPeerConnection = (
-    peerConnectionInstance,
-    stream
-  ) => {
-    stream.getTracks().forEach((track) => {
-      peerConnectionInstance.addTrack(track, stream);
-    });
   };
 
   const handleInitConnect = async () => {
+    console.clear();
+    handleClosePeerConnection(PEERCONNECTION_MAP);
     handleClearCacheValueBeforeConnect({ streams: [audioStream, audioStream] });
     const stream = await handleInitMedia();
 
@@ -218,7 +121,7 @@ const Room = () => {
       console.log("userId-----------", targetUserId, sourceUserId);
       if (targetUserId === sourceUserId) return;
       const peerConnectionInstance = handleGeneratePeerConnection();
-
+      handleBindCandidateDisconnectEvent(peerConnectionInstance);
       handleBindStreamForPeerConnection(peerConnectionInstance, stream);
 
       // 生成offer
@@ -227,14 +130,16 @@ const Room = () => {
       handleBindCandidateForPeerConnection(
         peerConnectionInstance,
         targetUserId,
-        sourceUserId
+        sourceUserId,
+        socket
       );
 
       // 保存peerConnection实例
       handleSavePeerConnection(
         sourceUserId,
         targetUserId,
-        peerConnectionInstance
+        peerConnectionInstance,
+        PEERCONNECTION_MAP
       );
       socket.emit("relayOffer", {
         offer,
@@ -293,24 +198,10 @@ const Room = () => {
     });
   };
 
-  const handleDrawCanvas = () => {
-    const canvasContext = canvasRef.current.getContext("2d");
-    // canvasContext.imageSmoothingEnabled = false;
-    // canvasContext.globalCompositeOperation = "copy";
-    if (!videoRef.current.srcObject) return;
-    canvasContext.drawImage(
-      videoRef.current,
-      0,
-      0,
-      mediaVideoSetting.width,
-      mediaVideoSetting.height
-    );
-    requestAnimationFrame(handleDrawCanvas);
-  };
-
   const handleStopScreenShare = () => {
+    handleClosePeerConnection(PEERCONNECTION_MAP);
     audioStream?.getTracks().forEach((track) => track.stop());
-    // videoRef.current.srcObject = null;
+    videoStream?.getTracks().forEach((track) => track.stop());
   };
 
   useEffect(() => {
@@ -320,11 +211,14 @@ const Room = () => {
       // const targetUserId = sourceUserId;
       // const sourceUserId = targetUserId;
       if (targetUserId === userInfo.id) {
+        console.clear();
         const peerConnectionInstance = handleGeneratePeerConnection();
+        handleBindCandidateDisconnectEvent(peerConnectionInstance);
         handleSavePeerConnection(
           sourceUserId,
           targetUserId,
-          peerConnectionInstance
+          peerConnectionInstance,
+          PEERCONNECTION_MAP
         );
 
         peerConnectionInstance.setRemoteDescription(offer);
@@ -334,7 +228,8 @@ const Room = () => {
         handleBindCandidateForPeerConnection(
           peerConnectionInstance,
           targetUserId,
-          sourceUserId
+          sourceUserId,
+          socket
         );
 
         cb &&
@@ -379,6 +274,7 @@ const Room = () => {
         const { userListOfRoom } = payload || {};
         setUserListOfRoom(userListOfRoom);
         console.log("加入房间成功", userListOfRoom);
+        console.clear();
       }
     );
   }, []);
@@ -447,7 +343,14 @@ const Room = () => {
               ref={videoRef}
               id="video"
               className={styles.video}
+              x-webkit-airplay="allow"
+              webkit-playsinline="true"
+              playsInline
+              muted
               autoPlay
+              x5-video-player-type="h5"
+              x5-video-player-fullscreen="true"
+              x5-video-orientation="portraint"
             ></video>
           </>
         </article>
