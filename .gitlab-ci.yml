@@ -18,7 +18,7 @@ deploy:
       mv ./deploy/nginx/nginx.beta.conf ./deploy/nginx/nginx.conf;
       export GIT_BRANCH=-$CI_COMMIT_REF_NAME ;  fi;
   script:
-    - docker-compose -f ./deploy/docker-compose.yaml  up -d --build
+    - docker-compose -f ./deploy/docker-compose.yaml -p abcRtcFront  up -d --build
     - echo https://${APP}${GIT_BRANCH}.abclive.cloud
 
 notification:
