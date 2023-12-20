@@ -19,7 +19,7 @@ context="{
   \"content\": {
     \"post\": {
       \"zh-CN\": {
-        \"title\": \"$CI_PROJECT_NAME $CI_COMMIT_REF_NAME 发布\",
+        \"title\": \"CICD信息\",
         \"content\": [
           [
             {
